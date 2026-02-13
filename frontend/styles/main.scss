@@ -1,0 +1,137 @@
+// Практика 1: SCSS (SASS) — карточка товара
+// Требования: переменные (>=2), миксин (>=1), вложенность селекторов.
+
+$color-primary: #fdfff5;//#3d642d;// #3498db;
+$color-bg: #111;
+$color-surface: #1b1b1b;
+$color-text: #f5f5f5;
+$color-fav: #ff2400;
+$radius: 14px;
+$gap: 14px;
+
+// Миксин (аналог функции): задаём базовый вид кнопки.
+// Параметр $bg позволяет переиспользовать миксин для разных кнопок.
+@mixin button($bg) {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: $bg;
+  color: $color-surface;
+  text-decoration: none;
+  font-weight: 600;
+  line-height: 1;
+}
+
+@mixin buttonWithIcon($bg){
+    text-decoration: none;
+    display: flex;
+    gap: $gap;
+    align-items: center;
+    justify-content: end;
+    svg{
+        height: 30px;
+        fill: $bg;
+    }
+    p{
+        font-size: 1.15em;
+        color: $color-text;
+        margin: 0;
+    }
+    &:hover{
+        svg{
+            fill: $color-fav;
+        }
+    }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: $color-bg;
+  color: $color-text;
+}
+
+.page {
+  max-width: 980px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+// Вложенность: описываем элементы карточки внутри .product-card
+.product-card {
+  display: grid;
+  grid-template-columns: 500px 1fr;
+  gap: $gap;
+  background: $color-surface;
+  border-radius: $radius;
+  padding: 18px;
+
+  &--accent {
+    border: 2px solid $color-primary;
+  }
+
+  &__image {
+    border-radius: $radius;
+    max-width: 500px;
+    height: auto;
+  }
+
+  &__content {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 22px;
+  }
+
+  &__desc {
+    margin: 0;
+    opacity: 0.85;
+    line-height: 1.4;
+    font-size: 1.15em;
+  }
+
+  &__footer {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__price {
+    font-size: 20px;
+    font-weight: 700;
+  }
+}
+
+.desc{
+    &__parameters {
+        padding-left: 0;
+    }
+    &__parameter {
+        list-style: none;
+    }
+}
+
+.btn {
+  // Подключаем миксин и передаём цвет фона
+  @include button($color-primary);
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+}
+
+.fav-btn{
+    @include buttonWithIcon($color-primary);
+    &.active{
+        svg{
+            fill: $color-fav;
+        }
+    }
+}
