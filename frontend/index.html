@@ -1,48 +1,13 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Практика 1 — карточка товара (SCSS)</title>
-    <link rel="stylesheet" href="./public/main.css" />
+    <title>frontend</title>
   </head>
   <body>
-    <main class="page">
-      <article class="product-card product-card--accent">
-        <img class="product-card__image" src="gelik.webp" aria-hidden="true"></div>
-
-        <div class="product-card__content">
-            <a class="fav-btn" id="fav-btn" href="#">
-                <p>В избранное</p>
-                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 437.775 437.774" style="enable-background:new 0 0 437.775 437.774;" xml:space="preserve">
-                    <g>
-                        <path d="M316.722,29.761c66.852,0,121.053,54.202,121.053,121.041c0,110.478-218.893,257.212-218.893,257.212S0,266.569,0,150.801 C0,67.584,54.202,29.761,121.041,29.761c40.262,0,75.827,19.745,97.841,49.976C240.899,49.506,276.47,29.761,316.722,29.761z" ></path>
-                    </g>
-                </svg>
-            </a>
-          <h1 class="product-card__title">Mercedes-Benz G-class AMG 63 AMG II(W465) Рестайлинг, 2025</h1>
-          <div class="product-card__desc">
-            <ul class="desc__parameters">
-                <li class="desc__parameter">Пробег: 10км</li>
-                <li class="desc__parameter">Двигатель: 4.0л, 585 л.с., Бензин</li>
-                <li class="desc__parameter">Коробка: Автомат</li>
-                <li class="desc__parameter">Привод: Полный</li>
-            </ul>
-            <p class="desc__text">Автомобиль не стоял на учете, вы будете первым владельцем.</p>
-          </div>
-          <div class="product-card__footer">
-            <span class="product-card__price">360 000 $</span>
-            <a class="btn" href="#">Купить</a>
-          </div>
-        </div>
-      </article>
-    </main>
-    <script>
-        const favBtn = document.getElementById('fav-btn');
-
-        favBtn.addEventListener('click', function() {
-            this.classList.toggle('active');
-        });
-    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
