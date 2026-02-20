@@ -1,5 +1,5 @@
 const express = require("express");
-// const cors = require("cors");
+const cors = require("cors");
 
 const logger = require("./middleware/logger");
 const productsRouter = require("./routes/products");
@@ -7,7 +7,9 @@ const productsRouter = require("./routes/products");
 const app  = express();
 const PORT = process.env.PORT || 3000
 
-// app.use(cors());
+app.use(cors({
+    origin: "http://localhost:3001"
+}));
 
 app.use(express.json());
 
