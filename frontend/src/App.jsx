@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createProduct, deleteProduct, getProducts, updateProduct } from "./api/productsApi";
-// import "App.scss"
+import "./App.scss"
 
 /**
  * Практика 4 (заготовка).
@@ -78,36 +78,41 @@ export default function App() {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 24, fontFamily: "system-ui" }}>
-      <h1>Практика 4 — React + Express API</h1>
+      <h1 style={{ textAlign: "center" }}>Практика 4 — React + Express API</h1>
 
-      <section style={{ marginTop: 24, padding: 16, border: "1px solid #ddd", borderRadius: 12 }}>
-        <h2 style={{ marginTop: 0 }}>Добавить товар</h2>
-        <form onSubmit={onAdd} style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+      <section style={{ marginTop: 24, /*padding: 16, /*border: "1px solid #ddd",*/ borderRadius: 12 }}>
+        <h2 style={{ marginTop: 0, textAlign: "center" }}>Добавить товар</h2>
+        <form onSubmit={onAdd} /*style={{ display: "flex", gap: 12, flexWrap: "wrap" }}*/>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Название"
-            style={{ padding: 10, minWidth: 220 }}
+            style={{ padding: 10/*, minWidth: 220 */ }}
           />
           <input
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             placeholder="Цена"
             type="number"
-            style={{ padding: 10, width: 140 }}
+            style={{ padding: 10/*, width: 140 */ }}
           />
-          <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Описание" style={{padding: 10, width:220 }}/>
-          <button disabled={!canSubmit} style={{ padding: "10px 14px" }}>
+          <input value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Описание"
+            style={{ padding: 10/*, width:220 */ }} />
+          <button disabled={!canSubmit} /*style={{ padding: "10px 14px" }}*/>
             Добавить
-          </button>
-          <button type="button" onClick={load} style={{ padding: "10px 14px" }}>
-            Обновить список
           </button>
         </form>
       </section>
 
       <section style={{ marginTop: 24 }}>
-        <h2>Список товаров</h2>
+        <div className="productsHeader">
+          <h2>Список товаров</h2>
+          <button type="button" onClick={load} style={{ padding: "10px 14px" }}>
+            Обновить список
+          </button>
+        </div>
 
         {loading && <p>Загрузка...</p>}
         {error && (
@@ -118,14 +123,16 @@ export default function App() {
           </p>
         )}
 
-        <ul style={{ paddingLeft: 18 }}>
+        <ul className="productsList" style={{ paddingLeft: 18 }}>
           {items.map((p) => (
             <li key={p.id} style={{ marginBottom: 8 }}>
-              <b>{p.title}</b> — {p.price} ₽{" "} - <i>{p.description}</i>
-              <button onClick={() => onPricePlus(p.id, p.price)} style={{ marginLeft: 8 }}>
+              <span className="Title">{p.title}</span>
+              <span className="Price">{p.price} ₽</span>
+              <span className="Description">{p.description}</span>
+              <button className="plusButton" onClick={() => onPricePlus(p.id, p.price)} style={{ marginLeft: 8 }}>
                 +10 ₽
               </button>
-              <button onClick={() => onDelete(p.id)} style={{ marginLeft: 8 }}>
+              <button className="deleteButton" onClick={() => onDelete(p.id)} style={{ marginLeft: 8 }}>
                 Удалить
               </button>
             </li>

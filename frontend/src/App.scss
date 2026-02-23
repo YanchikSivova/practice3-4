@@ -1,0 +1,72 @@
+$color-background: #f9f6f6; //#EFE6D5;
+$color-primary:#393939;
+// $color-accent: #e73213;
+$color-accent1: #FF6f61;
+$color-accent2:#ffd6a5;
+$radius: 16px;
+
+@mixin inputForm{
+    background-color: $color-background;
+    color: $color-accent1;
+    // border: 1px solid $color-primary;
+    border-radius: $radius;
+}
+
+@mixin btn($bg, $col){
+    background-color: $bg;
+    color: $col;
+    // border: 1px solid $bg;
+    border-radius: $radius;
+}
+body{
+    background-color: $color-background;
+    color: $color-accent1;
+    font-size: 20px;
+}
+
+form{
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr 1fr;
+    gap: 12px;
+    padding: 12px 24px;
+    border-radius: 24px;
+    // background-color: $color-accent;
+    background: linear-gradient(45deg, #FF6f61, #FFD6a5);
+    input{
+        @include inputForm();
+        border: 1px solid $color-background
+    }
+    button{
+        @include btn($color-background, $color-accent1);
+        border: 1px solid $color-background;
+        padding: 10px;
+    }
+}
+
+.productsHeader{
+    display: flex;
+    gap: 24px;
+    h2{
+        margin: 0;
+    }
+    button{
+        @include btn($color-accent1, $color-background);
+        border: 1px solid $color-accent1;
+    }
+}
+
+.productsList{
+    list-style: none;
+    li{
+        display: grid;
+        grid-template-columns: 2fr 1fr 2fr 0.75fr 1.25fr;
+        .plusButton{
+            @include btn($color-accent1, $color-background);
+            border: 1px solid $color-accent1;
+        }
+        .deleteButton{
+            @include btn($color-background, $color-accent1);
+            border: 1px solid $color-accent1;
+        }
+    }
+}
