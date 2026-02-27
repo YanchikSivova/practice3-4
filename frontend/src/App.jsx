@@ -76,6 +76,28 @@ export default function App() {
     }
   }
 
+  async function onEdit(id, field, value){
+    setError("");
+    try{
+      if(field == 'price'){
+        const numValue = Number(value);
+        if (isNaN(numValue) || numValue < 0){
+          throw new Error('Цена должна быть числом больше или равным 0');
+        }
+        value = value.trim();
+      }else {
+        if (typeof(value) !== 'string' || !value.trim()){
+          throw new Error('Поле не может быть пустым');
+        }
+        value = value.trim();
+      }
+      await updateProduct(id, { [field]: value});
+      await load();
+    }catch (e){
+      setError(String(e?.message || e));
+    }
+  }
+
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 24, fontFamily: "system-ui" }}>
       <h1 style={{ textAlign: "center" }}>Практика 4 — React + Express API</h1>
@@ -123,12 +145,43 @@ export default function App() {
           </p>
         )}
 
-        <ul className="productsList" style={{ paddingLeft: 18 }}>
+        <ul className="productsList">
           {items.map((p) => (
             <li key={p.id} style={{ marginBottom: 8 }}>
-              <span className="Title">{p.title}</span>
-              <span className="Price">{p.price} ₽</span>
-              <span className="Description">{p.description}</span>
+              {/* <button className="changeButton">Изменить</button> */}
+              <span className="Title"
+              onClick={() => {
+                const newTitle = prompt('Введите новое название: ', p.title);
+                if (newTitle && newTitle.trim()){
+                  onEdit(p.id, 'title', newTitle.trim());
+                }
+              }}
+              style={{cursor: 'pointer'}}
+              >
+                {p.title}
+                </span>
+              <span className="Price"
+              onClick={() => {
+                const newPrice = prompt('Введите новую цену: ', p.price);
+                if (newPrice && newPrice.trim()){
+                  onEdit(p.id, 'price', newPrice.trim());
+                }
+              }}
+              style={{cursor:'pointer'}}
+              >
+                {p.price} ₽
+                </span>
+              <span className="Description"
+              onClick={()=>{
+                const newDescription = prompt('Введите новое описание: ', p.description);
+                if (newDescription && newDescription.trim()){
+                  onEdit(p.id, 'description', newDescription.trim());
+                }
+              }}
+              style={{cursor:'pointer'}}
+              >
+                {p.description}
+                </span>
               <button className="plusButton" onClick={() => onPricePlus(p.id, p.price)} style={{ marginLeft: 8 }}>
                 +10 ₽
               </button>

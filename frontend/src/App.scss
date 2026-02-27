@@ -57,6 +57,7 @@ form{
 
 .productsList{
     list-style: none;
+    padding-left: 0px;
     li{
         display: grid;
         grid-template-columns: 2fr 1fr 2fr 0.75fr 1.25fr;
