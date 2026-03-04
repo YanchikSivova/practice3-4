@@ -1,9 +1,9 @@
 const express = require("express");
 const { nanoid } = require("nanoid")
-
+const store = require("../store/productsStore")
 const router = express.Router();
 
-let products = require("../data/products");
+// let products = require("../data/products");
 
 /**
  * @swagger
@@ -17,7 +17,7 @@ let products = require("../data/products");
  *              - description
  *          properties:
  *              id:
- *                  type: number
+ *                  type: string
  *                  description: Уникальный ID товара
  *              title:
  *                  type: string
@@ -29,21 +29,11 @@ let products = require("../data/products");
  *                  type: string
  *                  description: Описание товара
  *          example:
- *              id: 1
+ *              id: Wfn2e8Q2
  *              title: Печенье
  *              price: 150
  *              description: Очень вкусное печенье
  */
-
-/**
- * 
- * вспомогательная функция: найти товар по id
- */
-function findById(id){
-    const num = Number(id);
-    if (Number.isNaN(num)) return null;
-    return products.find((p) => p.id === num) || null;
-}
 
 /**
  * @swagger
@@ -82,60 +72,44 @@ function findById(id){
  *                                  example: "title must be a non-empty string"
  */
 //GET /api/products
-router.get("/", (req, res)=>{
-    res.json(products);
+router.get("/", async (req, res, next)=>{
+    try{
+        const products = await store.readAll();
+        res.json(products);
+    } catch(e){
+        next(e);
+    }
 });
 
-router.post("/", (req, res)=>{
-    const {title, price, description} = req.body;
-    if (typeof title !== "string" || title.trim() === ""){
-        return res.status(400).json({error:"title is required (string)"});
+router.post("/", async (req, res, next)=>{
+    try{
+        const {title, price, description} = req.body;
+        if (typeof title !== "string" || title.trim() === ""){
+            return res.status(400).json({error:"title is required (string)"});
+        }
+        if (typeof description !== "string" || description.trim() === ""){
+            return res.status(400).json({error:"description is required (string)"});
+        }
+        const numPrice = Number(price);
+        if (Number.isNaN(numPrice) || numPrice < 0){
+            return res.status(400).json({error:"price is required (number >= 0)"});
+        }
+        const newProduct = {
+            id: nanoid(8),
+            title: title.trim(),
+            price: Number(price),
+            description: description.trim(),
+        };
+        await store.add(newProduct);
+        res.status(201).json(newProduct);
+    } catch(e){
+        next(e);
     }
-    if (typeof description !== "string" || description.trim() === ""){
-        return res.status(400).json({error:"description is required (string)"});
-    }
-    const numPrice = Number(price);
-    if (Number.isNaN(numPrice) || numPrice < 0){
-        return res.status(400).json({error:"price is required (number >= 0)"});
-    }
-
-    const nextId = products.length? Math.max(...products.map((p) => p.id))+1:1;
-    const newProduct = {id: nextId, title: title.trim(), price: numPrice, description: description.trim()};
-    products.push(newProduct);
-    res.status(201).json(newProduct);
 });
 
 /**
  * @swagger
  * /api/products/:id:
- *  get:
- *      summary: Возвращает продукт с id
- *      tags: [Products]
- *      parameters:
- *        - in: path
- *          name: id
- *          required: true
- *          schema:
- *              type: integer
- *          description: Уникальный идентификатор продукта
- *          example: 1
- *      responses:
- *          200:
- *              description: Продукт найдет
- *              content: 
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Product'
- *          404:
- *              description: Продукт не найден
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              error:
- *                                  type: string
- *                                  example: "Product not found"
  *  patch:
  *      summary: Изменяет указанные поля
  *      tags: [Products]
@@ -144,9 +118,9 @@ router.post("/", (req, res)=>{
  *          name: id
  *          required: true
  *          schema:
- *              type: integer
+ *              type: string
  *          description: Уникальный идентификатор продукта
- *          example: 1
+ *          example: Wfn2e8Q2
  *      responses:
  *          200:
  *              description: Продукт изменен
@@ -211,53 +185,103 @@ router.post("/", (req, res)=>{
  *          
  */
 
-router.get("/:id", (req, res) => {
-    const product = findById(req.params.id);
-    if (!product) return res.status(404).json({error:"Product not found"});
-    res.json(product);
+router.patch("/:id", async (req, res, next) => {
+    try{
+        const products = await store.readAll();
+        const product = products.find(p => p.id === req.params.id);
+        
+        if (!product) return res.status(404).json({error:"Product not found"});
+        
+        const {title, price, description} = req.body;
+        
+        if (title !== undefined){
+            if (typeof title !== "string" || title.trim() === ""){
+                return res.status(400).json({error:"title must be a non-empty string"});
+            }
+            product.title = title.trim();
+        }
+    
+        if (price !== undefined){
+            const numPrice = Number(price);
+            if (Number.isNaN(numPrice) || numPrice < 0){
+                return res.status(400).json({error: "price must be a number >= 0"});
+            }
+            product.price = numPrice;
+        }
+    
+        if (description !== undefined){
+            if (typeof description !== "string" || description.trim() === ""){
+                return res.status(400).json({error: "description must be a non-empty string"});
+            }
+            product.description = description.trim();
+        }
+        
+        await store.patch(product);
+        res.status(200).json(product);
+    } catch(e){
+        next(e);
+    }
 });
 
-
-router.patch("/:id", (req, res) => {
-    const product = findById(req.params.id);
-    if (!product) return res.status(404).json({error:"Product not found"});
-
-    const {title, price, description} = req.body;
-
-    if (title != undefined){
-        if (typeof(title) !== "string" || title.trim()===""){
-            return res.status(400).json({error:"title must be a non-empty string"});
-        }
-        product.title = title.trim();
+router.delete("/:id", async (req, res, next)=>{
+    try{
+        const ok = await store.remove(req.params.id);
+        if (!ok) return res.status(404).json({error: "Not found"});
+        res.status(204).json({ok: true});
+    }catch(e){
+        next(e);
     }
-
-    if (price != undefined){
-        const numPrice = Number(price);
-        if (Number.isNaN(numPrice) || numPrice < 0){
-            return res.status(400).json({error: "price must be a number >= 0"});
-        }
-        product.price = numPrice;
-    }
-
-    if (description != undefined){
-        if (typeof(description) !== "string" || description.trim() === ""){
-            return res.status(400).json({error: "description must be a non-empty string"});
-        }
-        product.description = description.trim();
-    }
-
-    res.status(200).json(product);
 });
 
-router.delete("/:id", (req, res)=>{
-    const before = products.length;
-    const id = Number(req.params.id);
-    if (Number.isNaN(id)) return res.status(400).json({error:"id must be a number"});
-    products = products.filter((p) => p.id !== id);
-    if (products.length === before){
-        return res.status(404).json({error:"Product not found"});
-    } 
-    return res.status(204).send();
+/**
+ * @swagger
+ * /api/products/search:
+ *  get:
+ *      summary: Поиск товаров по названию
+ *      tags: [Products]
+ *      parameters:
+ *        - in: query
+ *          name: title 
+ *          required: false
+ *          schema:
+ *              type: string
+ *          description: Строка для поиска в названиях товаров
+ *          example: "сок"
+ *      responses:
+ *          200:
+ *              description: Успешный поиск
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items:
+ *                              $ref: '#/components/schemas/Product'
+ *                      example:
+ *                         - id: "Wfn2e8Q2"
+ *                           title: "сок"
+ *                           price: 150
+ *                           description: "вкусный сок"
+ *                         - id: "Xy7k9pL3"
+ *                           title: "апельсиновый сок"
+ *                           price: 200
+ *                           description: "свежевыжатый сок"
+ */
+
+router.get("/search", async (req, res, next) => {
+    try{
+        const {title} = req.query;   //параметр из запроса
+        const products = await store.readAll();
+
+        if(!title) {
+            return res.json(products);
+        }
+
+        const searchTerm = title.toLowerCase().trim();
+        const filtered = products.filter(p => p.title && p.title.toLowerCase().includes(searchTerm));
+        res.status(200).json(filtered);
+    }catch(e){
+        next(e);
+    }
 });
 
 module.exports = router;

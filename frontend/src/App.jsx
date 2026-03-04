@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createProduct, deleteProduct, getProducts, updateProduct } from "./api/productsApi";
+import { createProduct, deleteProduct, getProducts, updateProduct, searchProduct} from "./api/productsApi";
 import "./App.scss"
 
 /**
@@ -11,6 +11,10 @@ export default function App() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Состояния для поиска
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
 
   // Минимальная форма добавления товара
   const [title, setTitle] = useState("");
@@ -32,6 +36,30 @@ export default function App() {
     }
   }
 
+  //Функция поиска
+async function handleSearch(){
+  if(!searchTerm.trim()){
+    await load();
+    return;
+  }
+  setError("");
+  setSearchLoading(true);
+  try{
+    const data = await searchProduct(searchTerm.trim());
+    setItems(data);
+  }catch(e){
+    setError(String(e?.message || e));
+  }finally{
+    setSearchLoading(false);
+  }
+}
+
+//Сброс поиска
+
+async function handleReset(){
+  setSearchTerm("");
+  await load();
+}
   useEffect(() => {
     load();
   }, []);
@@ -100,7 +128,7 @@ export default function App() {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 24, fontFamily: "system-ui" }}>
-      <h1 style={{ textAlign: "center" }}>Практика 4 — React + Express API</h1>
+      <h1 style={{ textAlign: "center" }}>React + Express API</h1>
 
       <section style={{ marginTop: 24, /*padding: 16, /*border: "1px solid #ddd",*/ borderRadius: 12 }}>
         <h2 style={{ marginTop: 0, textAlign: "center" }}>Добавить товар</h2>
@@ -131,24 +159,38 @@ export default function App() {
       <section style={{ marginTop: 24 }}>
         <div className="productsHeader">
           <h2>Список товаров</h2>
+          {/* Поиск */}
           <button type="button" onClick={load} style={{ padding: "10px 14px" }}>
             Обновить список
           </button>
+          <div className="searchbar">
+            <form className="searchbar-form">
+              <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Введите название для поиска..."/>
+            </form>
+            <button type="button" onClick={handleSearch} disabled={searchLoading}>
+              {searchLoading ? "Поиск..." : "Найти"} 
+            </button>
+            <button type="button" onClick={handleReset}>
+              Сброс
+            </button>
+          </div>
         </div>
+      
 
         {loading && <p>Загрузка...</p>}
+        {searchLoading && <p>Поиск...</p>}
         {error && (
-          <p style={{ color: "crimson" }}>
-            Ошибка: {error}
-            <br />
-            Проверьте, что: (1) backend запущен на 3000, (2) CORS настроен, (3) TODO в productsApi.js реализованы.
-          </p>
+          <p>Ошибка: {error}</p>
+        )}
+        
+        {!loading && !searchLoading && searchTerm && (
+          <p>Найдено товаров по запросу "{searchTerm}" : {items.length}</p>
         )}
 
         <ul className="productsList">
           {items.map((p) => (
             <li key={p.id} style={{ marginBottom: 8 }}>
-              {/* <button className="changeButton">Изменить</button> */}
               <span className="Title"
               onClick={() => {
                 const newTitle = prompt('Введите новое название: ', p.title);
@@ -190,6 +232,12 @@ export default function App() {
               </button>
             </li>
           ))}
+
+          {!loading && !searchLoading && items.length === 0 && (
+            <li>
+              {searchTerm ? "Ничего не найдено" : "Товары отсутствуют"}
+            </li>
+          )}
         </ul>
 
       </section>

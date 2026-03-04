@@ -44,8 +44,10 @@ form{
 }
 
 .productsHeader{
-    display: flex;
+    display: grid;
+    grid-template-columns: 1.65fr 1.35fr 3fr;
     gap: 24px;
+    margin-bottom: 12px;
     h2{
         margin: 0;
     }
@@ -53,7 +55,24 @@ form{
         @include btn($color-accent1, $color-background);
         border: 1px solid $color-accent1;
     }
+    .searchbar{
+        display: grid;
+        grid-template-columns: 5fr 1fr 0.5fr;
+        gap: 8px;
+        .searchbar-form{
+            padding: 6px 12px;
+            border-radius: 24px;
+            background: linear-gradient(45deg, #FF6f61, #FFD6a5);
+            display: flex;
+            input{
+                @include inputForm();
+                padding: 6px 12px;
+                width: 100%;
+            }
+        }
+    }
 }
+
 
 .productsList{
     list-style: none;

@@ -25,3 +25,9 @@ export async function deleteProduct(id) {
   const response = await api.delete(`/products/${id}`);
   return response.data;
 }
+
+export async function searchProduct(name){
+  // const response = await api.get(`api/products/search?name=${name}`);
+  const response = await api.get(`/products/search?title=${encodeURIComponent(name)}`);
+  return response.data;
+}
