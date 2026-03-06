@@ -156,7 +156,7 @@ router.post("/", async (req, res, next)=>{
  *          name: id
  *          required: true
  *          schema:
- *              type: integer
+ *              type: string
  *          description: Уникальный идентификатор продукта
  *          example: 1
  *      responses:

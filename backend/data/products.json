@@ -4,5 +4,11 @@
     "title": "сок яблочный",
     "price": 200,
     "description": "вкусна"
+  },
+  {
+    "id": "WBw_vQNT",
+    "title": "сок вишневый",
+    "price": 250,
+    "description": "вкусный сок"
   }
 ]
