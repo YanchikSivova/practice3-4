@@ -1,9 +1,8 @@
 const express = require("express");
-const { nanoid } = require("nanoid")
+const { nanoid } = require("nanoid");
+const { authMiddleware, requireRole } = require("../middleware/authJWT");
 const store = require("../store/productsStore")
 const router = express.Router();
-
-// let products = require("../data/products");
 
 /**
  * @swagger
@@ -72,27 +71,27 @@ const router = express.Router();
  *                                  example: "title must be a non-empty string"
  */
 //GET /api/products
-router.get("/", async (req, res, next)=>{
-    try{
+router.get("/", authMiddleware, async (req, res, next) => {
+    try {
         const products = await store.readAll();
         res.json(products);
-    } catch(e){
+    } catch (e) {
         next(e);
     }
 });
 
-router.post("/", async (req, res, next)=>{
-    try{
-        const {title, price, description} = req.body;
-        if (typeof title !== "string" || title.trim() === ""){
-            return res.status(400).json({error:"title is required (string)"});
+router.post("/", authMiddleware, requireRole("admin"), async (req, res, next) => {
+    try {
+        const { title, price, description } = req.body;
+        if (typeof title !== "string" || title.trim() === "") {
+            return res.status(400).json({ error: "title is required (string)" });
         }
-        if (typeof description !== "string" || description.trim() === ""){
-            return res.status(400).json({error:"description is required (string)"});
+        if (typeof description !== "string" || description.trim() === "") {
+            return res.status(400).json({ error: "description is required (string)" });
         }
         const numPrice = Number(price);
-        if (Number.isNaN(numPrice) || numPrice < 0){
-            return res.status(400).json({error:"price is required (number >= 0)"});
+        if (Number.isNaN(numPrice) || numPrice < 0) {
+            return res.status(400).json({ error: "price is required (number >= 0)" });
         }
         const newProduct = {
             id: nanoid(8),
@@ -102,7 +101,7 @@ router.post("/", async (req, res, next)=>{
         };
         await store.add(newProduct);
         res.status(201).json(newProduct);
-    } catch(e){
+    } catch (e) {
         next(e);
     }
 });
@@ -185,50 +184,98 @@ router.post("/", async (req, res, next)=>{
  *          
  */
 
-router.patch("/:id", async (req, res, next) => {
+router.get("/:id", authMiddleware, async (req, res, next) => {
     try{
+        const list = await store.readAll();
+        const product = list.find((p) => p.id === req.params.id) || null;
+        if (!product){
+            return res.status(404).json({
+                error: "product_not_found",
+                message: "Товар не найден",
+            })
+        };
+        res.json(product);
+    }catch(err){
+        next(err);
+    }
+});
+
+router.put("/:id", authMiddleware, requireRole("admin"), async (req, res, next) => {
+    try {
         const products = await store.readAll();
         const product = products.find(p => p.id === req.params.id);
-        
-        if (!product) return res.status(404).json({error:"Product not found"});
-        
-        const {title, price, description} = req.body;
-        
-        if (title !== undefined){
-            if (typeof title !== "string" || title.trim() === ""){
-                return res.status(400).json({error:"title must be a non-empty string"});
-            }
-            product.title = title.trim();
+
+        if (!product) return res.status(404).json({ error: "Product not fount" });
+
+        const { title, price, description } = req.body;
+        if (title === undefined || price === undefined || description === undefined) {
+            return res.status(400).json({ error: "Empty field(s)" });
         }
-    
-        if (price !== undefined){
-            const numPrice = Number(price);
-            if (Number.isNaN(numPrice) || numPrice < 0){
-                return res.status(400).json({error: "price must be a number >= 0"});
-            }
-            product.price = numPrice;
+        if (typeof title !== "string" || title.trim() === "") {
+            return res.status(400).json({ error: "title must be a non-empty string" });
         }
-    
-        if (description !== undefined){
-            if (typeof description !== "string" || description.trim() === ""){
-                return res.status(400).json({error: "description must be a non-empty string"});
-            }
-            product.description = description.trim();
+        product.title = title.trim();
+        const numPrice = Number(price);
+        if (Number.isNaN(numPrice) || numPrice < 0) {
+            return res.status(400).json({ error: "price must be a number >= 0" });
         }
-        
-        await store.patch(product);
+        product.price = numPrice;
+        if (typeof description !== "string" || description.trim() === "") {
+            return res.status(400).json({ error: "description must be a non-empty string" });
+        }
+        product.description = description.trim();
+
+        await store.put(product);
         res.status(200).json(product);
     } catch(e){
         next(e);
     }
 });
 
-router.delete("/:id", async (req, res, next)=>{
-    try{
+router.patch("/:id", authMiddleware, requireRole("admin"), async (req, res, next) => {
+    try {
+        const products = await store.readAll();
+        const product = products.find(p => p.id === req.params.id);
+
+        if (!product) return res.status(404).json({ error: "Product not found" });
+
+        const { title, price, description } = req.body;
+
+        if (title !== undefined) {
+            if (typeof title !== "string" || title.trim() === "") {
+                return res.status(400).json({ error: "title must be a non-empty string" });
+            }
+            product.title = title.trim();
+        }
+
+        if (price !== undefined) {
+            const numPrice = Number(price);
+            if (Number.isNaN(numPrice) || numPrice < 0) {
+                return res.status(400).json({ error: "price must be a number >= 0" });
+            }
+            product.price = numPrice;
+        }
+
+        if (description !== undefined) {
+            if (typeof description !== "string" || description.trim() === "") {
+                return res.status(400).json({ error: "description must be a non-empty string" });
+            }
+            product.description = description.trim();
+        }
+
+        await store.patch(product);
+        res.status(200).json(product);
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.delete("/:id", authMiddleware, requireRole("admin"), async (req, res, next) => {
+    try {
         const ok = await store.remove(req.params.id);
-        if (!ok) return res.status(404).json({error: "Not found"});
-        res.status(204).json({ok: true});
-    }catch(e){
+        if (!ok) return res.status(404).json({ error: "Not found" });
+        res.status(204).json({ ok: true });
+    } catch (e) {
         next(e);
     }
 });
@@ -267,19 +314,19 @@ router.delete("/:id", async (req, res, next)=>{
  *                           description: "свежевыжатый сок"
  */
 
-router.get("/search", async (req, res, next) => {
-    try{
-        const {title} = req.query;   //параметр из запроса
+router.get("/search", authMiddleware, async (req, res, next) => {
+    try {
+        const { title } = req.query;   //параметр из запроса
         const products = await store.readAll();
 
-        if(!title) {
+        if (!title) {
             return res.json(products);
         }
 
         const searchTerm = title.toLowerCase().trim();
         const filtered = products.filter(p => p.title && p.title.toLowerCase().includes(searchTerm));
         res.status(200).json(filtered);
-    }catch(e){
+    } catch (e) {
         next(e);
     }
 });

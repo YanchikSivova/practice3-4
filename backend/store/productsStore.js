@@ -36,6 +36,15 @@ async function add(product){
     return product;
 }
 
+async function put(putObj){
+    const list = await readAll();
+    const idx = list.findIndex((p) => p.id === putObj.id);
+    if (idx === -1) return null;
+    list[idx] = putObj;
+    await writeAll(list);
+    return list[idx];
+}
+
 async function patch(patchObj){
     const list = await readAll();
     const idx = list.findIndex((p) => p.id === patchObj.id);
@@ -53,4 +62,4 @@ async function remove(id){
     return true;
 }
 
-module.exports = { readAll, add, patch, remove };
+module.exports = { readAll, add, put, patch, remove };

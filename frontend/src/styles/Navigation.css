@@ -1,0 +1,15 @@
+.nav-menu{
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+a{
+    text-decoration: none;
+    color: var(--color-accent1);
+    font-size: 24px;
+}
+
+.active{
+    font-weight: 500;
+}

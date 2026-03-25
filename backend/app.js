@@ -6,6 +6,8 @@ const swaggerUi = require("swagger-ui-express");
 
 const logger = require("./middleware/logger");
 const productsRouter = require("./routes/products");
+const authRouter = require("./routes/auth");
+const adminRouter = require("./routes/admin");
 
 const app  = express();
 const PORT = process.env.PORT || 3000
@@ -44,8 +46,10 @@ app.get("/", (req, res) =>{
     res.send("Express API is running. Try /api/products");
 });
 
+app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);
-
+app.use("/api/admin", adminRouter)
+;
 app.use((err,req, res, next) => {
     console.error("Unhandled error: ", err);
     res.status(500).json({error: "Internal server error"});
@@ -56,4 +60,6 @@ app.use((req, res) => {
 });
 app.listen(PORT, () => {
     console.log(`Server started: http://localhost:${PORT}`);
+    console.log(`Swagger UI: http://localhost:${PORT}/api-docs`);
 });
+

@@ -3,12 +3,12 @@
     "id": "sBHTjIQB",
     "title": "сок яблочный",
     "price": 200,
-    "description": "вкусна"
+    "description": "вкусный"
   },
   {
     "id": "WBw_vQNT",
-    "title": "сок вишневый",
-    "price": 250,
+    "title": "апельсиновый сок",
+    "price": 300,
     "description": "вкусный сок"
   }
 ]

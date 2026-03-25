@@ -18,13 +18,10 @@ $radius: 16px;
     // border: 1px solid $bg;
     border-radius: $radius;
 }
-body{
-    background-color: $color-background;
-    color: $color-accent1;
-    font-size: 20px;
-}
 
-form{
+
+.product-form,
+.searchbar-form{
     display: grid;
     grid-template-columns: 2fr 1fr 2fr 1fr;
     gap: 12px;
