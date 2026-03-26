@@ -122,7 +122,7 @@ async function handleReset(){
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: 24, fontFamily: "system-ui" }}>
+    <main style={{ maxWidth: 900, margin: "0 auto", padding: 24, fontFamily: "system-ui" }}>
       <h1 style={{ textAlign: "center" }}>React + Express API</h1>
 
       <section style={{ marginTop: 24, /*padding: 16, /*border: "1px solid #ddd",*/ borderRadius: 12 }}>
@@ -236,7 +236,7 @@ async function handleReset(){
         </ul>
 
       </section>
-    </div>
+    </main>
   );
 }
 

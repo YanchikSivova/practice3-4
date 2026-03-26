@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { loginUser } from "../api/authApi";
 import { useNavigate } from "react-router-dom";
-import Home from "./Home";
+import "../styles/login.css"
 function Login() {
     const [formData, setFormData] = useState({
         email: '',
@@ -42,59 +42,70 @@ function Login() {
             setValidationErrors(errors);
             return;
         }
-        const success = await loginUser(formData.email, formData.password);
+        const success = await loginUser({
+            email: formData.email,
+            password: formData.password
+        });
         if (success) {
             navigate('/account');
         }
     };
 
-    const goToRegister = () =>{
+    const goToRegister = () => {
         navigate('/register')
     };
 
     return (
-        <div className="login">
+        <main className="login">
             <h1>Войти</h1>
             <form className="login-form" onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Email</label>
-                    <input
-                    type="email"
-                    id="email"
-                    placeholder="your@email.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={validationErrors.email? 'error':''}
-                    required/>
-                    <p className="field-error" style={{color: 'red', fontSize:'12px'}}>
-                        {validationErrors.email}
-                    </p>
+                    <div>
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="your@email.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className={validationErrors.email ? 'error' : ''}
+                            required />
+                    </div>
+                    {validationErrors.email &&
+                        <p className="field-error" style={{ color: 'red', fontSize: '12px' }}>
+                            {validationErrors.email}
+                        </p>
+                    }
                 </div>
                 <div className="form-group">
                     <label>Пароль</label>
-                    <input
-                    type="password"
-                    id="password"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={validationErrors.password? 'error':''}
-                    required/>
-                    <p className="field-error" style={{color: 'red', fontSize:'12px'}}>
-                        {validationErrors.password}
-                    </p>
+                    <div>
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="••••••••"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className={validationErrors.password ? 'error' : ''}
+                            required />
+                    </div>
+                    {validationErrors.password &&
+                        <p className="field-error" style={{ color: 'red', fontSize: '12px' }}>
+                            {validationErrors.password}
+                        </p>
+                    }
                 </div>
-                <button 
-                type="submit"
-                className="submit-button">
+                <button
+                    type="submit"
+                    className="submit-button">
                     Вход
                 </button>
-                <p className="login-footer">
-                    Нет аккаунта?
-                    <span onClick={goToRegister} style={{cursor: 'pointer'}}> Pегистрация</span>
-                </p>
             </form>
-        </div>
+            <p className="login-footer">
+                Нет аккаунта?
+                <span onClick={goToRegister} style={{ cursor: 'pointer', fontWeight: '600' }}> Pегистрация</span>
+            </p>
+        </main>
     );
 }
 

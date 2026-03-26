@@ -1,0 +1,14 @@
+.info{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+.info-name{
+    font-weight: 600;
+}
+.logout-button{
+    border-radius: var(--radius);
+    background-color: var(--color-background);
+    color: var(--color-accent1);
+    border: 1px solid var(--color-accent1);
+    padding: 12px 24px;
+}

@@ -5,5 +5,5 @@ export async function getUsers(){
 }
 
 export async function setUserRole(userId, role) {
-    return (await api.patch(`/admin/users/${userId},/role`, {role})).data;
+    return (await api.patch(`/admin/users/${userId}/role`, {role})).data;
 }

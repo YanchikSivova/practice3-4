@@ -5,7 +5,12 @@ import "../styles/Navigation.css";
 function Navigation(){
     const location = useLocation();
     const [user, setUser] = useState(null);
-    useEffect(()=>{
+    const fetchUser = () =>{
+        const token = localStorage.getItem('accessToken');
+        if(!token){
+            setUser(null);
+            return;
+        }
         getMe()
             .then(userData => {
                 setUser(userData);
@@ -13,7 +18,11 @@ function Navigation(){
             .catch(err => {
                 console.error('Failed to fetch user: ', err);
             });
-    }, []);
+    };
+
+    useEffect(()=>{
+        fetchUser();
+    }, [location.pathname]);
     return (
     <nav className="main-navigation">
         <ul className="nav-menu">
@@ -29,11 +38,18 @@ function Navigation(){
                     </Link>
                 )}
                 {!user && (
-                    <Link to="/login" className={location.pathname === '/login'? "active" : ''}>
+                    <Link to="/login" className={location.pathname === '/login' || location.pathname === '/register' ? "active" : ''}>
                         Войти
                     </Link>
                 )}
             </li>
+            { user?.role === 'admin' &&
+                <li>
+                    <Link to="/admin" className={location.pathname === '/admin'? 'active' : ''}>
+                        Управление
+                    </Link>
+                </li>
+            }
         </ul>
     </nav>
     );
