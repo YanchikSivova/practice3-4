@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "access_secret";
 const REFRESH_SECRET = process.env.REFRESH_SECRET || "refresh_secret";
 
-const ACCESS_EXPIRES_IN = process.env.ACCESS_EXPIRES_IN || "15m";
+const ACCESS_EXPIRES_IN = process.env.ACCESS_EXPIRES_IN || "10m";
 const REFRESH_EXPIRES_IN = process.env.REFRESH_EXPIRES_IN || "7d";
 
 function authMiddleware(req, res, next){

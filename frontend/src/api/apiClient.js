@@ -10,23 +10,24 @@ export const api = axios.create({
   timeout: 5000,
 });
 
+
 const ACCESS_KEY = "accessToken";
 const REFRESH_KEY = "refreshToken";
 
-export function getAccessToken(){
+export function getAccessToken() {
   return localStorage.getItem(ACCESS_KEY);
 }
 
-export function getRefreshToken(){
+export function getRefreshToken() {
   return localStorage.getItem(REFRESH_KEY);
 }
 
-export function setTokens({accessToken, refreshToken}){
+export function setTokens({ accessToken, refreshToken }) {
   if (accessToken) localStorage.setItem(ACCESS_KEY, accessToken);
   if (refreshToken) localStorage.setItem(REFRESH_KEY, refreshToken);
 }
 
-export function clearTokens(){
+export function clearTokens() {
   localStorage.removeItem(ACCESS_KEY);
   localStorage.removeItem(REFRESH_KEY);
 }
@@ -34,13 +35,16 @@ export function clearTokens(){
 api.interceptors.request.use(
   (config) => {
     const accessToken = getAccessToken();
-    if (accessToken){
+    if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
+const apiNoAuth = axios.create({
+  baseURL: "http://localhost:3000/api",
+});
 
 let refreshInFlight = null;
 
@@ -50,30 +54,30 @@ api.interceptors.response.use(
     const status = error?.response?.status;
     const originalRequest = error.config;
 
-    if (status === 401 && originalRequest && !originalRequest._retry){
+    if (status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
       const refreshToken = getRefreshToken();
-      if (!refreshToken){
+      if (!refreshToken) {
         clearTokens();
         return Promise.reject(error);
       }
-      try{
-        if(!refreshInFlight){
-          refreshInFlight = api.post("/auth/refresh", null, {
+      try {
+        if (!refreshInFlight) {
+          refreshInFlight = apiNoAuth.post("/auth/refresh", null, {
             headers: {
-              "x-refresh-token" : refreshToken,
+              "x-refresh-token": refreshToken,
             },
           })
-          .then((r)=> r.data)
-          .finally(()=>{
-            refreshInFlight = null;
-          });
+          .then((r) => r.data)
+            .finally(() => {
+              refreshInFlight = null;
+            });
         }
         const tokens = await refreshInFlight;
         setTokens(tokens);
         originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
         return api(originalRequest);
-      }catch (refreshErr){
+      } catch (refreshErr) {
         clearTokens();
         return Promise.reject(refreshErr);
       }
